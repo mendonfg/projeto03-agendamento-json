@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendamento - Clínica Saúde</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container" role="main">
+    <h1>Agende sua Consulta</h1>
+    <form id="formAgendamento" novalidate aria-describedby="errorMsg">
+      <label for="nome">Nome completo</label>
+      <input type="text" id="nome" placeholder="Nome completo" required minlength="3" />
+
+      <label for="cpf">CPF (somente números)</label>
+      <input type="text" id="cpf" placeholder="CPF (11 dígitos)" required pattern="\\d{11}" maxlength="11" />
+
+      <label for="especialidade">Especialidade</label>
+      <select id="especialidade" required>
+        <option value="">Escolha a Especialidade</option>
+        <option value="Cardiologia">Cardiologia</option>
+        <option value="Nutrição">Nutrição</option>
+        <option value="Dermatologia">Dermatologia</option>
+        <option value="Ortopedia">Ortopedia</option>
+      </select>
+
+      <label for="profissional">Nome do Profissional</label>
+      <input type="text" id="profissional" placeholder="Nome do Profissional" required minlength="3" />
+
+      <label for="data">Data da Consulta</label>
+      <input type="date" id="data" required min="" />
+
+      <button type="submit">Agendar</button>
+      <p id="errorMsg" role="alert" aria-live="assertive" style="color: #d32f2f; margin-top: 10px;"></p>
+    </form>
+
+    <section class="consulta" aria-label="Consulta de agendamentos">
+      <h2>Consultar Agendamentos</h2>
+      <label for="buscarCPF" class="sr-only">Informe o CPF para consulta</label>
+      <input type="text" id="buscarCPF" placeholder="Informe o CPF" maxlength="11" />
+      <button onclick="buscarAgendamentos()">Buscar</button>
+      <div id="resultados" tabindex="0"></div>
+    </section>
+  </main>
+
+  <script>
+    // Formata data YYYY-MM-DD para DD/MM/YYYY
+    function formatarData(dataStr) {
+      const [ano, mes, dia] = dataStr.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    // Define a data mínima como hoje
+    const dataInput = document.getElementById('data');
+    const hoje = new Date().toISOString().split('T')[0];
+    dataInput.min = hoje;
+
+    const form = document.getElementById('formAgendamento');
+    const errorMsg = document.getElementById('errorMsg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.textContent = '';
+
+      // Validação do CPF
+      const cpf = document.getElementById('cpf').value.trim();
+      if (!/^\d{11}$/.test(cpf)) {
+        errorMsg.textContent = 'CPF inválido. Deve conter 11 números.';
+        return;
+      }
+
+      if (!dataInput.value) {
+        errorMsg.textContent = 'Informe uma data válida.';
+        return;
+      }
+
+      const data = {
+        nome: document.getElementById('nome').value.trim(),
+        cpf,
+        especialidade: document.getElementById('especialidade').value,
+        profissional: document.getElementById('profissional').value.trim(),
+        data: dataInput.value
+      };
+
+      try {
+        const res = await fetch('http://localhost:3001/agendamentos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const msg = await res.json();
+        if (res.ok) {
+          alert(msg.mensagem);
+          form.reset();
+          dataInput.min = new Date().toISOString().split('T')[0];
+        } else {
+          errorMsg.textContent = msg.mensagem || 'Erro no agendamento.';
+        }
+      } catch {
+        errorMsg.textContent = 'Erro ao conectar com o servidor.';
+      }
+    });
+
+    async function buscarAgendamentos() {
+      const cpf = document.getElementById('buscarCPF').value.trim();
+      if (!/^\d{11}$/.test(cpf)) {
+        alert('Digite um CPF válido com 11 números para buscar.');
+        return;
+      }
+      const res = await fetch('http://localhost:3001/agendamentos?cpf=' + cpf);
+      const data = await res.json();
+      const resultados = document.getElementById('resultados');
+      resultados.innerHTML = '';
+      if (data.length === 0) {
+        resultados.innerHTML = '<p>Nenhum agendamento encontrado.</p>';
+      } else {
+        data.forEach(ag => {
+          const item = document.createElement('div');
+          item.className = 'item';
+          item.innerHTML = `
+            <p><strong>Nome:</strong> ${ag.nome}</p>
+            <p><strong>Especialidade:</strong> ${ag.especialidade}</p>
+            <p><strong>Profissional:</strong> ${ag.profissional}</p>
+            <p><strong>Data:</strong> ${formatarData(ag.data)}</p>
+            <button onclick="cancelar('${ag.cpf}')">Cancelar</button>
+          `;
+          resultados.appendChild(item);
+        });
+      }
+    }
+
+    async function cancelar(cpf) {
+      if (!confirm('Deseja cancelar o agendamento?')) return;
+      const res = await fetch('http://localhost:3001/agendamentos/' + cpf, { method: 'DELETE' });
+      const msg = await res.json();
+      alert(msg.mensagem);
+      buscarAgendamentos();
+    }
+  </script>
+</body>
+</html>

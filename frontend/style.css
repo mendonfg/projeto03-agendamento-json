@@ -1,0 +1,145 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
+  color: #004d40;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+}
+
+.container {
+  background: white;
+  width: 100%;
+  max-width: 520px;
+  padding: 40px 50px;
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(0, 77, 64, 0.15);
+}
+
+h1 {
+  font-size: 2.4rem;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #00796b;
+  font-weight: 700;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+label {
+  font-weight: 600;
+  color: #00695c;
+  margin-bottom: 6px;
+}
+
+input, select, button {
+  padding: 14px 18px;
+  font-size: 1.1rem;
+  border: 2px solid #80cbc4;
+  border-radius: 10px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, select:focus {
+  border-color: #00796b;
+  outline: none;
+  box-shadow: 0 0 8px #004d40aa;
+}
+
+button {
+  background-color: #00796b;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #004d40;
+}
+
+.consulta {
+  margin-top: 45px;
+}
+
+.consulta h2 {
+  color: #00796b;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+#resultados {
+  margin-top: 20px;
+}
+
+.item {
+  background: #b2dfdb;
+  padding: 18px 25px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 77, 64, 0.15);
+  position: relative;
+}
+
+.item p {
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #004d40;
+}
+
+.item button {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  padding: 7px 16px;
+  font-size: 0.95rem;
+  background: #d32f2f;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.item button:hover {
+  background: #9a0007;
+}
+
+/* Responsividade */
+
+@media (max-width: 580px) {
+  .container {
+    padding: 30px 25px;
+  }
+  
+  input, select, button {
+    font-size: 1rem;
+    padding: 12px 14px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .consulta h2 {
+    font-size: 1.5rem;
+  }
+}
